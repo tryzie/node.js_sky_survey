@@ -5,7 +5,7 @@ const db = require('../db');
 // GET all responses
 router.get('/', async (req, res, next) => {
     try {
-        const result = await db.query('SELECT * FROM responses');
+        const result = await db.query('SELECT id, question, type, description, options, subfields FROM responses');
         res.json(result.rows);
     } catch (err) {
         next(err); //passes error to centralized error handler

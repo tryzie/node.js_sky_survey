@@ -23,6 +23,17 @@ app.use((err, req,res, next) => {
 }
 );
 
+const db = require('./db');
+
+db.connect((err) => {
+    if (err) {
+        console.error('Failed to connect to the database:', err);
+    } else {
+        console.log('Connected to the database.');
+    }
+});
+
+
 const morgan = require('morgan');
 app.use(morgan('combined')); // Logs all requests in a standard format
 

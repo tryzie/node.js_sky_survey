@@ -5,29 +5,32 @@ const db = require('../db');
 // GET all questions with error handling
 router.get('/', async (req, res) => {
     try {
-        const result = await db.query('SELECT * FROM questions');
+        const result = await db.query('SELECT id, question, type, description, options, subfields FROM questions');
+        console.log('Database result:', result.rows);
         res.json(result.rows);
     } catch (err) {
+        console.error('Error fetching questions:', err.message);
         res.status(500).json({error: 'Failed to fetch questions. '});
     }
 });
 
 // POST a new question with validation and error handling
 router.post('/', async (req, res) => {
-    const { name, type, required, description, options, multiple_choices } = req.body;
+    const { question, type, required, description, options, multiple_choices, subfields } = req.body;
 
     //validate input data 
-    if (!name || !type) {
+    if (!question || !type) {
         return res.status(400).json({error: 'Name and type are required fields.'});
         
     }
     try {
         const result = await db.query(
-            'INSERT INTO questions (name, type, required, description, options, multiple_choices) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *',
-            [name, type, required, description, options, multiple_choices]
+            'INSERT INTO questions (question, type, required, description, options, multiple_choices, subfields) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *',
+            [question, type, required, description, options, multiple_choices, subfields]
         );
         res.json(result.rows[0]);
-    } catch (err) {
+    } catch (err) {S
+        console.error('Error adding question:', err.message);
         res.status(500).json({error: 'Failed to add the question.'});
     }
 });
