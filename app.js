@@ -35,7 +35,7 @@ db.connect((err) => {
 
 
 const morgan = require('morgan');
-app.use(morgan('combined')); // Logs all requests in a standard format
+app.use(morgan('combined')); // Logs all requests 
 
 
 const PORT = 3000;

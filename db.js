@@ -1,12 +1,11 @@
 const { Pool } = require('pg');
 
-// Configure the connection to PostgreSQL
 const pool = new Pool({
-    user: 'colloh',  // PostgreSQL username
+    user: 'colloh',  
     host: 'localhost',
-    database: 'sky_survey_db', // Database name
-    password: 'Atariz@664',   // PostgreSQL password
-    port: 5432  // PostgreSQL port
+    database: 'sky_survey_db', 
+    password: 'Atariz@664',   
+    port: 5432  
 });
 
 pool.connect((err) => {
@@ -17,4 +16,4 @@ pool.connect((err) => {
     }
 });
 
-module.exports = pool; // Export the pool to use in other files
+module.exports = pool; 
