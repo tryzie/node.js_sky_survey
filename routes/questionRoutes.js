@@ -5,7 +5,7 @@ const db = require('../db');
 // GET all questions with error handling
 router.get('/', async (req, res) => {
     try {
-        const result = await db.query('SELECT id, question, type, description, options, subfields FROM questions');
+        const result = await db.query('SELECT id, question, type, description, options, subfields, file_properties FROM questions');
         console.log('Database result:', result.rows);
         res.json(result.rows);
     } catch (err) {

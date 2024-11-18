@@ -25,7 +25,15 @@ router.post('/', async (req, res) => {
     }
 
     try {
-        
+        // Prevent duplicate submissions
+        const existing = await db.query('SELECT * FROM responses WHERE email_address = $1', [email_address]);
+        if (existing.rows.length > 0) {
+            return res.status(400).json({ 
+                message: `The email ${email_address} has already submitted the survey.` 
+            });
+        }
+
+        // Format composite responses
         let formattedCompositeResponses = '';
         if (compositeResponses) {
             for (const [question, subfields] of Object.entries(compositeResponses)) {
@@ -36,6 +44,7 @@ router.post('/', async (req, res) => {
             }
         }
 
+        // Format multiple responses
         let formattedMultipleResponses = '';
         if (multipleResponses) {
             for (const [question, answers] of Object.entries(multipleResponses)) {
@@ -65,6 +74,5 @@ router.post('/', async (req, res) => {
         res.status(500).json({ message: "Error saving response" });
     }
 });
-
 
 module.exports = router;

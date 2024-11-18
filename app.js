@@ -1,5 +1,7 @@
 const express = require('express');
 const bodyParser = require('body-parser');
+const fs = require('fs');
+const path = require('path');
 
 // Import routes
 const certificateRoutes = require('./routes/certificateRoutes');
