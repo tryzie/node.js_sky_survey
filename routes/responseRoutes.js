@@ -16,10 +16,8 @@ router.post('/', async (req, res) => {
         multipleResponses,
     } = req.body;
 
-    // Log the incoming request body
     console.log("Incoming request body:", req.body);
 
-    // Validate required fields
     if (!email_address) {
         return res.status(400).json({ message: "Email is required" });
     }
@@ -28,8 +26,8 @@ router.post('/', async (req, res) => {
         // Prevent duplicate submissions
         const existing = await db.query('SELECT * FROM responses WHERE email_address = $1', [email_address]);
         if (existing.rows.length > 0) {
-            return res.status(400).json({ 
-                message: `The email ${email_address} has already submitted the survey.` 
+            return res.status(400).json({
+                message: `The email ${email_address} has already submitted the survey.`,
             });
         }
 
@@ -72,6 +70,42 @@ router.post('/', async (req, res) => {
     } catch (err) {
         console.error("Error saving response:", err.message);
         res.status(500).json({ message: "Error saving response" });
+    }
+});
+
+// GET responses (with optional filtering by email)
+router.get('/', async (req, res) => {
+    const { email } = req.query;
+
+    try {
+        let query = 'SELECT * FROM responses';
+        const params = [];
+
+        if (email) {
+            query += ' WHERE email_address = $1';
+            params.push(email);
+        }
+
+        const result = await db.query(query, params);
+
+        // Add certificate URLs to the response (if applicable)
+        const responsesWithCertificates = await Promise.all(
+            result.rows.map(async (response) => {
+                const certificates = await db.query(
+                    'SELECT file_name FROM certificates WHERE response_id = $1',
+                    [response.id]
+                );
+                return {
+                    ...response,
+                    certificates: certificates.rows.map((cert) => `/uploads/${cert.file_name}`), // Assuming certificates are stored in the 'uploads' folder
+                };
+            })
+        );
+
+        res.json(responsesWithCertificates);
+    } catch (err) {
+        console.error("Error fetching responses:", err.message);
+        res.status(500).json({ message: "Failed to fetch responses" });
     }
 });
 
