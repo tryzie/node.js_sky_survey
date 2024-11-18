@@ -25,7 +25,7 @@ router.post('/', async (req, res) => {
     }
 
     try {
-        // Combine all responses into formatted strings (or handle them as needed)
+        
         let formattedCompositeResponses = '';
         if (compositeResponses) {
             for (const [question, subfields] of Object.entries(compositeResponses)) {
