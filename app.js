@@ -18,7 +18,7 @@ app.use('/api/questions', questionRoutes);
 
 //centralized error handling
 app.use((err, req,res, next) => {
-    console.error(err.stack); //log the error
+    console.error(err.stack); 
     res.status(err.status || 500).json({
         error: err.message || 'An unexpected error occured.',
     });
@@ -37,7 +37,7 @@ db.connect((err) => {
 
 
 const morgan = require('morgan');
-app.use(morgan('combined')); // Logs all requests 
+app.use(morgan('combined'));  
 
 
 const PORT = 3000;

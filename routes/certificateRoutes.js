@@ -7,7 +7,7 @@ const path = require('path');
 // Configure Multer for file uploads
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
-        cb(null, 'uploads/'); // Directory where files will be stored
+        cb(null, 'uploads/'); 
     },
     filename: (req, file, cb) => {
         const uniqueSuffix = `${Date.now()}-${file.originalname}`;
@@ -24,7 +24,7 @@ const upload = multer({
         }
         cb(null, true);
     },
-    limits: { fileSize: 1 * 1024 * 1024 }, // 1 MB size limit
+    limits: { fileSize: 1 * 1024 * 1024 }, 
 });
 
 // GET all certificates

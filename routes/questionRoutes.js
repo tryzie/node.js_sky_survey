@@ -20,7 +20,7 @@ router.post('/', async (req, res) => {
 
     //validate input data 
     if (!question || !type) {
-        return res.status(400).json({error: 'Name and type are required fields.'});
+        return res.status(400).json({error: 'question and type are required fields.'});
         
     }
     try {

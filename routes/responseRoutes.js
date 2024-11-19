@@ -12,7 +12,6 @@ router.post('/', async (req, res) => {
         programming_stack,
         textResponses,
         compositeResponses,
-        singleResponses,
         multipleResponses,
     } = req.body;
 
@@ -23,7 +22,7 @@ router.post('/', async (req, res) => {
     }
 
     try {
-        // Prevent duplicate submissions
+        // Check for duplicate submissions
         const existing = await db.query('SELECT * FROM responses WHERE email_address = $1', [email_address]);
         if (existing.rows.length > 0) {
             return res.status(400).json({
@@ -50,6 +49,14 @@ router.post('/', async (req, res) => {
             }
         }
 
+        // Format text responses (if any)
+        let formattedTextResponses = '';
+        if (textResponses) {
+            for (const [question, answer] of Object.entries(textResponses)) {
+                formattedTextResponses += `${question}: ${answer}, `;
+            }
+        }
+
         // Insert into the responses table
         const result = await db.query(
             `INSERT INTO responses (full_name, email_address, description, gender, programming_stack)
@@ -57,7 +64,7 @@ router.post('/', async (req, res) => {
             [
                 full_name || null,
                 email_address,
-                `${description || ''}\n${formattedCompositeResponses || ''}`.trim(),
+                `${description || ''}\n${formattedCompositeResponses || ''}\n${formattedTextResponses || ''}`.trim(),
                 gender || null,
                 `${programming_stack || ''}, ${formattedMultipleResponses || ''}`.trim(),
             ]
@@ -73,7 +80,7 @@ router.post('/', async (req, res) => {
     }
 });
 
-// GET responses (with optional filtering by email)
+// GET responses with filtering by email
 router.get('/', async (req, res) => {
     const { email } = req.query;
 
@@ -88,7 +95,7 @@ router.get('/', async (req, res) => {
 
         const result = await db.query(query, params);
 
-        // Add certificate URLs to the response (if applicable)
+        // Add certificate URLs to the response
         const responsesWithCertificates = await Promise.all(
             result.rows.map(async (response) => {
                 const certificates = await db.query(
@@ -97,12 +104,23 @@ router.get('/', async (req, res) => {
                 );
                 return {
                     ...response,
-                    certificates: certificates.rows.map((cert) => `/uploads/${cert.file_name}`), // Assuming certificates are stored in the 'uploads' folder
+                    certificates: certificates.rows.map((cert) => `/uploads/${cert.file_name}`),
                 };
             })
         );
 
-        res.json(responsesWithCertificates);
+        // Map responses to include all data consistently
+        const mappedResponses = responsesWithCertificates.map((response) => ({
+            id: response.id,
+            full_name: response.full_name,
+            email_address: response.email_address,
+            description: response.description,
+            gender: response.gender,
+            programming_stack: response.programming_stack,
+            certificates: response.certificates,
+        }));
+
+        res.json(mappedResponses);
     } catch (err) {
         console.error("Error fetching responses:", err.message);
         res.status(500).json({ message: "Failed to fetch responses" });
