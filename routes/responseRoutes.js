@@ -49,7 +49,7 @@ router.post('/', async (req, res) => {
             }
         }
 
-        // Format text responses (if any)
+        // Format text responses 
         let formattedTextResponses = '';
         if (textResponses) {
             for (const [question, answer] of Object.entries(textResponses)) {
